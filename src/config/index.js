@@ -3,7 +3,7 @@ const config = {
     nodeEnv: process.env.NODE_ENV || 'development',
     logLevel: process.env.LOG_LEVEL || 'info',
     apiTimeout: parseInt(process.env.API_TIMEOUT || 5000),
-    version: '1.0.0',
+    version: '1.0.1',
 };
 
 // Add helper methods
