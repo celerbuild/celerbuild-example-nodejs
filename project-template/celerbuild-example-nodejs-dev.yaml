@@ -1,0 +1,51 @@
+name: celerbuild-example-nodejs-dev
+env: dev
+repoPath: git@github.com:celerbuild/celerbuild-example-nodejs.git
+targetDeployPath: /home/ubuntu/apps/nodejs
+targetDeployWarehousePath: /home/ubuntu/repos/nodejs
+targetWarehouseVersionKeep: 3
+serverClusterID: 37
+deployMode: branch
+deployUser: ubuntu
+buildCmds: |-
+  # Build Commands
+  tar --no-xattrs --no-mac-metadata -zcvf ${LOCAL_PACKAGE_FILE} .env.example *
+preDeploymentCmds: ''
+postDeploymentCmds: |-
+  #!/bin/bash
+
+  # Define project directories
+  SOURCE_DIR="${TARGET_DEPLOYMENT_PATH}/${TARGET_DEPLOYMENT_PROJECT_NAME}"
+  DEST_DIR="/home/ubuntu/celerbuild-example-nodejs"
+
+  # Check if the destination directory exists
+  if [ ! -d "$DEST_DIR" ]; then
+      sudo mkdir -p "$DEST_DIR"
+      echo "Directory $DEST_DIR created."
+  else
+      echo "Directory $DEST_DIR already exists."
+  fi
+
+  # Set permissions
+  sudo chown -R ubuntu:ubuntu "$DEST_DIR"
+  sudo chmod -R 755 "$DEST_DIR"
+
+  # Copy contents to the destination directory
+  cp -r "$SOURCE_DIR"/. "$DEST_DIR"
+
+  # Change to project directory
+  cd "$DEST_DIR"
+
+  # Create environment file from example if it exists
+  if [ -f ".env.example" ]; then
+      cp .env.example .env
+      echo ".env file created from .env.example"
+  fi
+
+  # Install dependencies
+  npm install
+
+  # Restart Node.js application using PM2
+  npm run pm2:restart:dev || npm run pm2:start:dev
+numberOfLatestTags: 0
+specifyBranches: dev
